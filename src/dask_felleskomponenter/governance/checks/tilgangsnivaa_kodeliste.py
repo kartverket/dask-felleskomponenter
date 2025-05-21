@@ -1,0 +1,57 @@
+tilgangsnivaa_kodeliste = {
+  "ContainedItemsResult": {
+    "Count": 2,
+    "Offset": 0,
+    "Limit": 0,
+    "Total": 0
+  },
+  "id": "tilgangsnivaa_dataplattform",
+  "label": "Tilgansnivå",
+  "lang": "no",
+  "owner": "DASK",
+  "manager": "Kartverket",
+  "containedItemClass": "CodelistValue",
+  "containeditems": [
+    {
+      "id": "http://publications.europa.eu/resource/authority/access-right/PUBLIC",
+      "label": "Allmen tilgang",
+      "lang": "no",
+      "itemclass": "CodelistValue",
+      "status": "Gyldig",
+      "description": "Offentlig tilgjengelig for alle. Bruksmerknad: Tillatte hindringer inkluderer registrering og forespørsel om API-nøkler, så lenge alle kan be om slik registrering og/eller API-nøkler.",
+      "owner": "EU",
+      "versionNumber": 1,
+      "lastUpdated": "2022-02-27",
+	  "dateSubmitted": "2013-01-01",
+      "codevalue": "public"
+    },
+        {
+      "id": "http://publications.europa.eu/resource/authority/access-right/RESTRICTED",
+      "label": "betinget tilgang",
+      "lang": "no",
+      "itemclass": "CodelistValue",
+      "status": "Gyldig",
+      "description": "Kun tilgjengelig under visse forhold. Merknad om bruk: Denne kategorien kan inkludere ressurser som krever betaling, ressurser som deles under taushetserklæringer, ressurser som utgiveren eller eieren ennå ikke har bestemt seg for om de kan offentliggjøres for.",
+      "owner": "EU",
+      "versionNumber": 1,
+      "lastUpdated": "2022-02-27",
+	  "dateSubmitted": "2013-01-01",
+      "codevalue": "restricted"
+    },
+	        {
+      "id": "http://publications.europa.eu/resource/authority/access-right/NON_PUBLIC",
+      "label": "ikke-allmenn tilgang",
+      "lang": "no",
+      "itemclass": "CodelistValue",
+      "status": "Gyldig",
+      "description": "Ikke offentlig tilgjengelig av personvern, sikkerhet eller andre grunner. Merknad om bruk: Denne kategorien kan inkludere ressurser som inneholder sensitiv eller personlig informasjon.",
+      "owner": "EU",
+      "versionNumber": 1,
+      "lastUpdated": "2022-02-27",
+	  "dateSubmitted": "2013-01-01",
+      "codevalue": "non_public"
+    }
+  ],
+  "containedSubRegisters": [],
+  "lastUpdated": "2025-03-14T10:54:29.317"
+}

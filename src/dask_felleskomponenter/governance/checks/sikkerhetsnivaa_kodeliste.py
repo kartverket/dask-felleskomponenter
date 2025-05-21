@@ -1,0 +1,43 @@
+sikkerhetsnivaa_kodeliste = {
+  "ContainedItemsResult": {
+    "Count": 2,
+    "Offset": 0,
+    "Limit": 0,
+    "Total": 0
+  },
+  "id": "sikkerhetsnivaa_dataplattform",
+  "label": "Sikkerhetsnivå",
+  "lang": "no",
+  "owner": "DASK",
+  "manager": "Kartverket",
+  "containedItemClass": "CodelistValue",
+  "containeditems": [
+    {
+      "id": "https://register.geonorge.no/metadata-kodelister/sikkerhetsnivaa/unclassified",
+      "label": "Ugradert",
+      "lang": "no",
+      "itemclass": "CodelistValue",
+      "status": "Gyldig",
+      "description": "'ugradert' refererer til informasjon som ikke har en sikkerhetsklassifisering fordi den uautoriserte avsløringen ikke vurderes å skade nasjonale sikkerhetsinteresser.",
+      "owner": "Kartverket",
+      "versionNumber": 1,
+      "lastUpdated": "2025-03-14T10:54:29.317",
+      "codevalue": "unclassified"
+    },
+    {
+      "id": "https://register.geonorge.no/metadata-kodelister/sikkerhetsnivaa/unclassified_sensitive",
+      "label": "Ungradert skjermingsverdig",
+      "lang": "no",
+      "itemclass": "CodelistValue",
+      "status": "Gyldig",
+      "description": "Ugradert skjermingsverdig informasjon er således informasjon med skadepotensiale for nasjonale sikkerhetsinteresser knyttet til tilgjengelighets- og/eller integritetsbehov, men hvor det ikke er behov for å beskytte informasjonens konfidensialitet i henhold tilsikkerhetsloven.",
+      "seoname": "unclassified-sensitive",
+      "owner": "Kartverket",
+      "versionNumber": 1,
+      "lastUpdated": "2025-03-14T10:54:29.317",
+      "codevalue": "unclassified_sensitive"
+    }
+  ],
+  "containedSubRegisters": [],
+  "lastUpdated": "2025-03-14T10:54:29.317"
+}
