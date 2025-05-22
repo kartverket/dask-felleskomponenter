@@ -6,6 +6,13 @@ on:
       version:
         description: "Version to be published"
         required: true
+        default: "0.0.1"
+        type: string
+
+
+permissions:
+  id-token: write # Required for Octo STS
+
 
 jobs:
   publish:
@@ -15,17 +22,20 @@ jobs:
       run:
         working-directory: dask-felleskomponenter
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - uses: octo-sts/action@6177b4481c00308b3839969c3eca88c96a91775f # v1.0.0
+        id: octo-sts
         with:
+          scope: kartverket/dask-felleskomponenter
+          identity: "dask-felleskomponenter"
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ steps.octo-sts.outputs.token }}
           fetch-depth: 0
 
-      - name: Get the current branch name
-        id: vars
-        run: echo "BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD)" >> $GITHUB_ENV
-
       - name: Set up Python
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v5
         with:
           python-version: "3.x"
 
@@ -33,27 +43,25 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install setuptools wheel twine build
-
-      - name: Configure Git
-        run: |
-          git config --local user.name "GitHub Actions"
-          git config --local user.email "actions@github.com"
 
       - name: Bump version in setup.py
         run: |
           sed -i "s/version=\"[^\"]*\"/version=\"${{ github.event.inputs.version }}\"/" setup.py
-          git add setup.py
-          git commit -m "Bump dask-felleskomponenter PyPI package version to ${{ github.event.inputs.version }}"
-          git push origin ${{ env.BRANCH_NAME }}
+
+      - name: Commit changes to repo
+        run: |
+          git config --local user.name "GitHub Actions"
+          git config --local user.email "noreply@kartverket.no"
+          git commit -am "Bump dask-felleskomponenter PyPI package version to ${{ github.event.inputs.version }}"
+          git push
 
       - name: Build the package
         run: |
           python3 -m build
 
-      - name: Publish to PyPI
-        run: |
-          python3 -m twine upload dist/*
-        env:
-          TWINE_USERNAME: __token__
-          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+      # - name: Publish to PyPI
+      #   run: |
+      #     python3 -m twine upload dist/*
+      #   env:
+      #     TWINE_USERNAME: __token__
+      #     TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
