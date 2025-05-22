@@ -1,5 +1,5 @@
 issuer: https://token.actions.githubusercontent.com
-subject: repo:kartverket/dask-felleskomponenter:ref:refs/heads/main
+subject: repo:kartverket/dask-felleskomponenter:environment:pypi-publish
 
 permissions:
   contents: write
