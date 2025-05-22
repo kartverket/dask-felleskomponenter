@@ -1,0 +1,20 @@
+{
+    "catalog": "catalog",
+    "schema": "schema",
+    "table": "table",
+    "tittel": "tittel",
+    "beskrivelse": "beskrivelse",
+    "tilgangsnivaa": "http://publications.europa.eu/resource/authority/access-right/PUBLIC",
+    "medaljongnivaa": "gold",
+    "hovedkategori": "https://register.geonorge.no/metadata-kodelister/tematisk-hovedkategori/farming",
+    "begrep": "https://register.geonorge.no/metadata-kodelister/nasjonal-temainndeling/Samfunnssikkerhet",
+    "epsg_koder": "25835",
+    "emneord": "bruksomraade",
+    "sikkerhetsnivaa": "https://register.geonorge.no/metadata-kodelister/sikkerhetsnivaa/unclassified_sensitive",
+    "column_properties": {
+        "geometri": {
+            "epsg": "25835",
+            "geometri_encoding": "wkt"
+        }
+    }
+}

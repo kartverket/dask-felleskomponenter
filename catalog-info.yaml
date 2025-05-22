@@ -1,0 +1,11 @@
+# nonk8s
+apiVersion: "backstage.io/v1alpha1"
+kind: "Component"
+metadata:
+  name: "dask-felleskomponenter"
+  tags:
+    - "internal"
+spec:
+  type: "documentation"
+  lifecycle: "production"
+  owner: "dataplattform"

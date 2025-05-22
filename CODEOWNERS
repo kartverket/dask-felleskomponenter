@@ -1,0 +1,11 @@
+#------------------------------------------------------------------------------
+
+# Denne koden forvaltes av:   Team DASK (Dataplattform Statens Kartverk)
+# Dokumentasjon:              https://kartverket.atlassian.net/wiki/spaces/DAT/overview
+# Virksomhetsapplikasjon:     ???
+
+# Automatic assign the following users as reviewers when a pull request is opened
+
+* @kartverket/dask
+
+/.security/ @sondrfos

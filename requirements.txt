@@ -1,0 +1,6 @@
+build
+twine
+coverage
+requests
+databricks-connect
+setuptools
