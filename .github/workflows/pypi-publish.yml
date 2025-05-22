@@ -45,15 +45,12 @@ jobs:
         run: |
           sed -i "s/version=\"[^\"]*\"/version=\"${{ github.event.inputs.version }}\"/" setup.py
 
-      - name: See github ref
-        run: echo "${{ github.ref }}"
-
-      # - name: Commit changes to repo
-      #   run: |
-      #     git config --local user.name "GitHub Actions"
-      #     git config --local user.email "noreply@kartverket.no"
-      #     git commit -am "Bump dask-felleskomponenter PyPI package version to ${{ github.event.inputs.version }}"
-      #     git push
+      - name: Commit changes to repo
+        run: |
+          git config --local user.name "GitHub Actions"
+          git config --local user.email "noreply@kartverket.no"
+          git commit -am "Bump dask-felleskomponenter PyPI package version to ${{ github.event.inputs.version }}"
+          git push
 
       - name: Build the package
         run: |
