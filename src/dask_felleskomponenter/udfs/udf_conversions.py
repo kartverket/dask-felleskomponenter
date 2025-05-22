@@ -11,9 +11,10 @@ def curved_to_linear_wkb(geometry, dfMaxAngleStepSizeDegrees=0):
 
     if geometry_serialized is None:
         return None
-        
+
     linear_geometry = geometry_serialized.GetLinearGeometry(dfMaxAngleStepSizeDegrees)
     return linear_geometry.ExportToWkb()
+
 
 def register_curved_to_linear_wkb_to_udf(spark):
     curved_to_linear_wkb_sql_name = "curved_to_linear_wkb"
@@ -21,8 +22,10 @@ def register_curved_to_linear_wkb_to_udf(spark):
     spark.udf.register(curved_to_linear_wkb_sql_name, curved_to_linear_wkb_udf)
     print(f"Registered SQL function '{curved_to_linear_wkb_sql_name}'")
 
+
 def register_all_udfs(spark):
     register_curved_to_linear_wkb_to_udf(spark)
+
 
 # Usage:
 # from udf_conversions import register_all_udfs

@@ -13,6 +13,10 @@ command
 pip install -r requirements.txt
 ```
 
+### Formatering av kode
+
+Python-kodebasen valideres med [Black](https://black.readthedocs.io/en/stable/) i en Github Action. Det betyr at din pull request kommer til å feile hvis koden er feilformatert, så automatisk formatering med Black bør settes opp lokalt i din editor.
+
 ## Bulding and publishing of package
 
 ### Steps for publishing using GitHub Actions
