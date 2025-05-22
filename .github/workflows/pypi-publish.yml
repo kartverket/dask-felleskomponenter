@@ -18,9 +18,6 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     environment: pypi-publish
-    defaults:
-      run:
-        working-directory: dask-felleskomponenter
     steps:
       - uses: octo-sts/action@6177b4481c00308b3839969c3eca88c96a91775f # v1.0.0
         id: octo-sts
