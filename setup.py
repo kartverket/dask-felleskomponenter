@@ -25,8 +25,5 @@ setuptools.setup(
     package_dir={"": "src"},
     packages=packages,  # Use the variable here
     python_requires=">=3.7",
-    install_requires=[
-        "requests",
-        "setuptools"
-    ],
+    install_requires=["requests", "setuptools"],
 )
