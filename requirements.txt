@@ -1,4 +1,5 @@
 build
+black
 twine
 coverage
 requests
