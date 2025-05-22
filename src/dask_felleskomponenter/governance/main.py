@@ -48,7 +48,8 @@ class Metadata:
         from pyspark.sql import SparkSession
 
         spark = SparkSession.builder.getOrCreate()
-        df = spark.sql(f"""
+        df = spark.sql(
+            f"""
                     SELECT C.*, CT.*
                     FROM system.information_schema.columns AS C 
                     LEFT JOIN system.information_schema.column_tags AS CT
@@ -59,7 +60,8 @@ class Metadata:
                     WHERE C.table_catalog = '{self.catalog}' 
                         AND C.table_schema = '{self.schema}' 
                         AND C.table_name = '{self.table}'
-                   """)
+                   """
+        )
         return df
 
     def validate(self) -> List[MetadataError]:
