@@ -13,9 +13,9 @@ command
 pip install -r requirements.txt
 ```
 
-### Formatering av kode
+### Code formatting
 
-Python-kodebasen valideres med [Black](https://black.readthedocs.io/en/stable/) i en Github Action. Det betyr at din pull request kommer til å feile hvis koden er feilformatert, så automatisk formatering med Black bør settes opp lokalt i din editor.
+The python code is validated against [Black](https://black.readthedocs.io/en/stable/) formatting in a Github Action. This means that your pull request will fail if the code isn't formatted according to Black standards. It is therefore suggested to enable automatic formatting using Black in your IDE.
 
 ## Bulding and publishing of package
 
@@ -29,11 +29,10 @@ One member of Team DASK needs to approve the workflow run before it starts.
 
 - Remove old dist-folder, from last time you published
 - Update version in `setup.py`, for instance `0.0.7`->`0.0.8`
-- Add change info to CHANGES.txt
 - (Run `pip install -r requirements.txt` if you haven't done that earlier)
 - Run `python3 -m build` (and wait some minutes...)
-- Verity that dist contains a package with the new version in the package name.
-- Run `python3 -m twine upload dist/*` to upload to pypi
+- Verify that dist contains a package with the new version in the package name.
+- Run `python3 -m twine upload dist/*` to upload to PyPi
 
 ### To upload to PyPi test
 
