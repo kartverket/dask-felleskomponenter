@@ -1,7 +1,6 @@
 build
 black
-twine
 coverage
 requests
-databricks-connect
 setuptools
+twine
