@@ -1,4 +1,4 @@
-name: Publish to PyPI
+name: Publish Python 🐍 distribution 📦 to PyPI and TestPyPI
 
 on:
   workflow_dispatch:
@@ -8,6 +8,21 @@ on:
         required: true
         default: "0.0.1"
         type: string
+      push_version_number_to_github:
+        description: "Push the given version number to Github"
+        required: true
+        default: true
+        type: boolean
+      publish_pypi:
+        description: "Publish to PyPI"
+        required: true
+        default: false
+        type: boolean
+      publish_testpypi:
+        description: "Publish to TestPyPI"
+        required: true
+        default: true
+        type: boolean
 
 
 permissions:
@@ -15,7 +30,8 @@ permissions:
 
 
 jobs:
-  publish:
+  build:
+    name: Build distribution 📦
     runs-on: ubuntu-latest
     environment: pypi-publish
     steps:
@@ -43,9 +59,10 @@ jobs:
 
       - name: Bump version in setup.py
         run: |
-          sed -i "s/version=\"[^\"]*\"/version=\"${{ github.event.inputs.version }}\"/" setup.py
+          sed -i "s/^version = \".*\"/version = \"${{ github.event.inputs.version }}\"/" pyproject.toml
 
       - name: Commit changes to repo
+        if: fromJson(github.event.inputs.push_version_number_to_github)
         run: |
           git config --local user.name "GitHub Actions"
           git config --local user.email "noreply@kartverket.no"
@@ -56,9 +73,50 @@ jobs:
         run: |
           python3 -m build
 
-      - name: Publish to PyPI
-        run: |
-          python3 -m twine upload dist/*
-        env:
-          TWINE_USERNAME: __token__
-          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+      - name: Store the distribution packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
+
+  publish-to-pypi:
+    name: Publish Python 🐍 distribution 📦 to PyPI
+    if: fromJson(github.event.inputs.publish_pypi)
+    needs:
+    - build
+    runs-on: ubuntu-latest
+
+    environment:
+      name: pypi
+      url: https://pypi.org/p/dask-felleskomponenter
+      
+    steps:
+    - name: Download all the dists
+      uses: actions/download-artifact@v4
+      with:
+        name: python-package-distributions
+        path: dist/
+    - name: Publish distribution 📦 to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
+
+  publish-to-testpypi:
+    name: Publish Python 🐍 distribution 📦 to TestPyPI
+    if: fromJson(github.event.inputs.publish_testpypi)
+    needs:
+    - build
+    runs-on: ubuntu-latest
+
+    environment:
+      name: testpypi
+      url: https://test.pypi.org/p/dask-felleskomponenter
+
+    steps:
+    - name: Download all the dists
+      uses: actions/download-artifact@v4
+      with:
+        name: python-package-distributions
+        path: dist/
+    - name: Publish distribution 📦 to TestPyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        repository-url: https://test.pypi.org/legacy/
