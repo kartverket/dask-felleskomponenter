@@ -1,6 +1,7 @@
 build
 black
 coverage
+databricks-connect
 requests
 setuptools
 twine
