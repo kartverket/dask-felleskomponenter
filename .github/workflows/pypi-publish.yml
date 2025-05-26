@@ -61,7 +61,7 @@ jobs:
           sed -i "s/version=\"[^\"]*\"/version=\"${{ github.event.inputs.version }}\"/" setup.py
 
       - name: Commit changes to repo
-        if: ${{ github.event.inputs.push_version_update_to_github }}
+        if: ${{ fromJson(github.event.inputs.push_version_update_to_github) }}
         run: |
           git config --local user.name "GitHub Actions"
           git config --local user.email "noreply@kartverket.no"
@@ -73,7 +73,7 @@ jobs:
           python3 -m build
 
       - name: Publish to PyPI
-        if: ${{ github.event.inputs.push_package_to_pypi }}
+        if: ${{ fromJson(github.event.inputs.push_package_to_pypi) }}
         run: |
           python3 -m twine upload dist/*
         env:
@@ -81,7 +81,7 @@ jobs:
           TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
 
       - name: Publish to TestPyPI
-        if: ${{ github.event.inputs.push_package_to_testpypi }}
+        if: ${{ fromJson(github.event.inputs.push_package_to_testpypi) }}
         run: |
           python3 -m twine upload --repository testpypi dist/*
         env:
