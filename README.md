@@ -6,7 +6,7 @@ You can find the PyPI package [here](https://pypi.org/project/dask-felleskompone
 
 ## Dependencies
 
-You need to install Python3.7 and higher, and to install the dependencies of this project, please execute the following
+You need to install Python 3.7 and higher, and to install the dependencies of this project, please execute the following
 command
 
 ```bash
@@ -19,24 +19,31 @@ The python code is validated against [Black](https://black.readthedocs.io/en/sta
 
 ## Bulding and publishing of package
 
-### Steps for publishing using GitHub Actions
+### Publishing using GitHub Actions
 
 Navigate to the [Publish to PyPI](https://github.com/kartverket/dask-modules/actions/workflows/pypi-publish.yml) workflow in GitHub Actions, choose the `main` branch and bump the version.
+The workflow is authenticated through [Trusted Publisher](https://docs.pypi.org/trusted-publishers/). The workflow can push to either TestPyPI or PyPI depending on the given input. 
 
-One member of Team DASK needs to approve the workflow run before it starts.
+You can choose to not commit the changed version number to github. This is useful if you are doing testing to avoid cleaning up commits. 
 
-### Steps for manual publishing
+One member of Team DASK needs to approve the workflow before it can publish to PyPI.
 
-- Remove old dist-folder, from last time you published
-- Update version in `setup.py`, for instance `0.0.7`->`0.0.8`
-- (Run `pip install -r requirements.txt` if you haven't done that earlier)
-- Run `python3 -m build` (and wait some minutes...)
-- Verify that dist contains a package with the new version in the package name.
-- Run `python3 -m twine upload dist/*` to upload to PyPi
+### Manual publishing to PyPI
 
-### To upload to PyPi test
+To do manual publishing you will need to provide the user credentials of a user with publishing access to the dask-felleskomponenter package on PyPI.
 
-Replace the last command with `python3 -m twine upload --repository testpypi dist/*`
+1. Remove old dist-folder, from last time you published
+2. Update version in `setup.py`, for instance `0.0.7`->`0.0.8`
+3. (Run `pip install -r requirements.txt` if you haven't done that earlier)
+4. Run `python3 -m build` (and wait some minutes...)
+5. Verify that dist contains a package with the new version in the package name.
+6. Run `python3 -m twine upload dist/*` to upload to PyPi
+
+### Manual publishing to TestPyPI
+
+To do manual publishing you will need to provide the user credentials of a user with publishing access to the dask-felleskomponenter package on TestPyPI.
+
+To do a manual publish to TestPyPI do steps 1 through 5 for publishing to PyPI, and finish using the command ` python3 -m twine upload --repository testpypi dist/* `
 
 ## Run tests
 
