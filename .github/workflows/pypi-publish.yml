@@ -80,7 +80,7 @@ jobs:
           path: dist/
 
   publish-to-pypi:
-    name: Publish Python 🐍 distribution 📦 to PyPI
+    name: Publish 🚀 to PyPI
     if: fromJson(github.event.inputs.publish_pypi)
     needs:
     - build
@@ -102,7 +102,7 @@ jobs:
         verbose: true
 
   publish-to-testpypi:
-    name: Publish Python 🐍 distribution 📦 to TestPyPI
+    name: Publish 🚀 to TestPyPI
     if: fromJson(github.event.inputs.publish_testpypi)
     needs:
     - build
