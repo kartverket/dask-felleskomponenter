@@ -8,6 +8,21 @@ on:
         required: true
         default: "0.0.1"
         type: string
+      push_version_update_to_github:
+        description: "Push version change in setup.py to Github"
+        required: true
+        default: true
+        type: boolean
+      push_package_to_pypi:
+        description: "Push package to PyPI"
+        required: true
+        default: true
+        type: boolean
+      push_package_to_testpypi:
+        description: "Push package to TestPyPI"
+        required: true
+        default: false
+        type: boolean
 
 
 permissions:
@@ -46,6 +61,7 @@ jobs:
           sed -i "s/version=\"[^\"]*\"/version=\"${{ github.event.inputs.version }}\"/" setup.py
 
       - name: Commit changes to repo
+        if: ${{ github.event.inputs.push_version_update_to_github }}
         run: |
           git config --local user.name "GitHub Actions"
           git config --local user.email "noreply@kartverket.no"
@@ -57,8 +73,17 @@ jobs:
           python3 -m build
 
       - name: Publish to PyPI
+        if: ${{ github.event.inputs.push_package_to_pypi }}
         run: |
           python3 -m twine upload dist/*
         env:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+
+      - name: Publish to TestPyPI
+        if: ${{ github.event.inputs.push_package_to_testpypi }}
+        run: |
+          python3 -m twine upload --repository testpypi dist/*
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.TESTPYPI_API_TOKEN }}
