@@ -18,14 +18,13 @@ classifiers = [
 ]
 dependencies = [
     "requests",
-    "setuptools",
     "databricks-connect"
 ]
 
 
 [project.urls]
-Homepage = "https://github.com/kartverket/dask-modules/dask-felleskomponenter"
-Issues = "https://github.com/kartverket/dask-modules/issues"
+Homepage = "https://github.com/kartverket/dask-felleskomponenter"
+Issues = "https://github.com/kartverket/dask-felleskomponenter/issues"
 
 [tool.setuptools.packages.find]
 where = ["src"]
