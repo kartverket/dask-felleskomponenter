@@ -251,9 +251,10 @@ def get_mandatory_metadata_for_medaljongnivaa(
     metadata_dict = {}
 
     for check in checks_for_valor[medaljongnivaa]:
-        metadata_error = check(TableMetadata(column_properties=column_properties), [])[
-            0
-        ]
+        check_output = check(TableMetadata(column_properties=column_properties), [])
+        if len(check_output) == 0:
+            continue
+        metadata_error = check_output[0]
         metadata_dict[metadata_error.for_field] = metadata_error
 
     return metadata_dict
