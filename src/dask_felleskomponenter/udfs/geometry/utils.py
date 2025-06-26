@@ -1,0 +1,31 @@
+
+# WKB Geometry type lookup
+WKB_GEOM_TYPES = {
+    0: "Geometry",
+    1: "Point",
+    2: "LineString",
+    3: "Polygon",
+    4: "MultiPoint",
+    5: "MultiLineString",
+    6: "MultiPolygon",
+    7: "GeometryCollection",
+    8: "CircularString",
+    9: "CompoundCurve",
+    10: "CurvePolygon",
+    11: "MultiCurve",
+    12: "MultiSurface",
+    13: "Curve",
+    14: "Surface",
+    15: "PolyhedralSurface",
+    16: "TIN",
+    17: "Triangle",
+    18: "Circle",
+    19: "GeodesicString",
+    20: "EllipticalCurve",
+    21: "NurbsCurve",
+    22: "Clothoid",
+    23: "SpiralCurve",
+    24: "CompoundSurface",
+    102: "AffinePlacement",
+    1025: "BrepSolid"
+}
