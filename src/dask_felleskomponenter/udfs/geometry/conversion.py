@@ -2,11 +2,12 @@
 
 from osgeo import ogr
 from pyspark.sql.types import BinaryType
+from typing import Optional
 
 
 def curved_to_linear_wkb(
     geometry_wkb: bytes, dfMaxAngleStepSizeDegrees: float = 0.0
-) -> bytes:
+) -> Optional[bytes]:
     """
     Converts curved geometries (e.g., CircularString) in WKB format to linear approximations.
 
