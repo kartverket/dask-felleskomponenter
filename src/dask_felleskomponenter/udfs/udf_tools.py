@@ -77,11 +77,6 @@ def get_wkb_geom_type(wkb_value):
 get_wkb_geom_type_udf = udf(get_wkb_geom_type, StringType())
 
 
-def register_all_udfs(spark):
-    get_wkb_geom_type_udf(spark)
-
-
-
 # ----- GDAL COUNTOURS: PYTHON FUNCTION -----
 # This function processes a raster binary into MultiLineString WKB geometry.
 
@@ -197,6 +192,10 @@ def generate_contours_udf(raster_series: Iterator[pd.Series]) -> Iterator[pd.Ser
         )
         yield results
 
+
+def register_all_udfs(spark):
+    get_wkb_geom_type_udf(spark)
+    generate_contours_udf(spark)
 
 # Usage:
 # from udf_tools import register_all_udfs
