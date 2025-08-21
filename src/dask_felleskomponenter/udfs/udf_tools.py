@@ -1,5 +1,8 @@
 from pyspark.sql.functions import udf
-from pyspark.sql.types import StringType
+from pyspark.sql.types import StringType, BinaryType
+
+from typing import Iterator
+import pandas as pd
 
 # WKB Geometry type lookup
 WKB_GEOM_TYPES = {
@@ -32,6 +35,7 @@ WKB_GEOM_TYPES = {
     1025: "BrepSolid"
 }
 
+@udf(StringType())
 def get_wkb_geom_type(wkb_value):
     if wkb_value is None:
         return "Invalid"
@@ -74,7 +78,10 @@ def get_wkb_geom_type(wkb_value):
     return geom_type_str
 
 # Register UDF
-get_wkb_geom_type_udf = udf(get_wkb_geom_type, StringType())
+def register_curved_to_linear_wkb_to_udf(spark):
+    get_wkb_geom_type_sql_name = "get_wkb_geom_type"
+    spark.udf.register(get_wkb_geom_type_sql_name, get_wkb_geom_type)
+    print(f"Registered SQL function '{get_wkb_geom_type_sql_name}'")
 
 
 # ----- GDAL COUNTOURS: PYTHON FUNCTION -----
@@ -195,7 +202,6 @@ def generate_contours_udf(raster_series: Iterator[pd.Series]) -> Iterator[pd.Ser
 
 def register_all_udfs(spark):
     get_wkb_geom_type_udf(spark)
-    generate_contours_udf(spark)
 
 # Usage:
 # from udf_tools import register_all_udfs
