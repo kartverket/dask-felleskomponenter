@@ -1,7 +1,8 @@
 from osgeo import ogr
-from pyspark.sql.types import BinaryType
-from pyspark.sql.functions import udf
+
 from pyspark.sql import SparkSession
+from pyspark.sql.functions import udf
+from pyspark.sql.types import BinaryType
 
 
 @udf(BinaryType())
@@ -35,6 +36,19 @@ def curved_to_linear_wkb(geometry: BinaryType, dfMaxAngleStepSizeDegrees: float 
 
 
 def register_curved_to_linear_wkb_to_spark(spark: SparkSession):
+    """
+    Registers the 'curved_to_linear_wkb' UDF with the provided SparkSession.
+
+    This function registers a user-defined function (UDF) named 'curved_to_linear_wkb' in the given SparkSession,
+    making it available for use in Spark SQL queries. The UDF converts curved geometries to their
+    linear representations in Well-Known Binary (WKB) format.
+
+    Args:
+        spark (SparkSession): The SparkSession instance to register the UDF with.
+
+    Returns:
+        None
+    """
     curved_to_linear_wkb_sql_name = "curved_to_linear_wkb"
     spark.udf.register(curved_to_linear_wkb_sql_name, curved_to_linear_wkb)
     print(f"Registered SQL function '{curved_to_linear_wkb_sql_name}'")
@@ -42,11 +56,12 @@ def register_curved_to_linear_wkb_to_spark(spark: SparkSession):
 
 def register_all_udfs(spark: SparkSession):
     """
-    Registers all user-defined functions (UDFs) required for the application with the provided Spark session.
-
-    Currently, this function registers the curved-to-linear WKB conversion UDF.
+    Registers all user-defined functions (UDFs) in udf_conversions with the provided SparkSession.
 
     Args:
-        spark (pyspark.sql.SparkSession): The Spark session to which the UDFs will be registered.
+        spark (SparkSession): The SparkSession instance to register the UDFs with.
+
+    This function calls individual UDF registration functions to ensure that all necessary UDFs are available 
+    for use in Spark SQL queries and DataFrame operations.
     """
     register_curved_to_linear_wkb_to_spark(spark)
