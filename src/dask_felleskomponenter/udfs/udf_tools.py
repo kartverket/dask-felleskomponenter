@@ -41,66 +41,66 @@ WKB_GEOM_TYPES = {
     1025: "BrepSolid",
 }
 
+# EWKB bit flags for dimensionality and SRID
+EWKB_Z_FLAG = 0x80000000
+EWKB_M_FLAG = 0x40000000
+EWKB_SRID_FLAG = 0x20000000
+EWKB_FLAG_MASK = EWKB_Z_FLAG | EWKB_M_FLAG | EWKB_SRID_FLAG
 
 @udf(StringType())
 def get_wkb_geom_type(wkb_value):
     """
-    Extracts the geometry type from a WKB (Well-Known Binary) value.
-
-    This UDF (User Defined Function) is intended for use with PySpark and returns a string
-    representing the geometry type (e.g., 'Point', 'Polygon', etc.) from a WKB or EWKB value.
-    It handles both hexadecimal string and bytes input, and accounts for dimensionality flags
-    (e.g., Z, M, ZM) as well as invalid or malformed inputs.
-
-    Args:
-        wkb_value (str or bytes): The WKB or EWKB value as a hexadecimal string or bytes.
-
-    Returns:
-        str: The geometry type as a string, possibly suffixed with dimensionality (e.g., 'Point Z').
-            Returns 'Invalid' or a specific error message for malformed inputs.
+    Extracts the geometry type from a WKB or EWKB value, correctly handling
+    hex string, bytes, and bytearray inputs from Spark.
     """
+    # Step 1: Unambiguously get the input into a `bytes` object.
     if wkb_value is None:
-        return "Invalid"
+        return "Invalid (null input)"
 
     if isinstance(wkb_value, str):
         try:
             wkb_bytes = bytes.fromhex(wkb_value)
-        except Exception:
+        except (ValueError, TypeError):
             return "Invalid (not hex)"
-    else:
+    # Accept both bytes and bytearray as valid binary types.
+    elif isinstance(wkb_value, (bytes, bytearray)):
         wkb_bytes = wkb_value
+    else:
+        return f"Invalid (unsupported type: {type(wkb_value).__name__})"
 
+    # Step 2: Validate the bytes object.
     if len(wkb_bytes) < 5:
         return "Invalid (too short)"
 
-    byte_order = wkb_bytes[0]
+    # Step 3: Parse the validated bytes.
+    byte_order = "big" if wkb_bytes[0] == 0 else "little"
+    geom_type_int = int.from_bytes(wkb_bytes[1:5], byteorder=byte_order, signed=False)
 
-    if byte_order == 0:
-        geom_type_int = int.from_bytes(wkb_bytes[1:5], byteorder="big", signed=False)
+    base_geom_type_int = geom_type_int
+    suffix = ""
+
+    # Check for EWKB flags (high-order bits).
+    if (geom_type_int & EWKB_FLAG_MASK) != 0:
+        has_z = (geom_type_int & EWKB_Z_FLAG) != 0
+        has_m = (geom_type_int & EWKB_M_FLAG) != 0
+        if has_z and has_m: suffix = " ZM"
+        elif has_z: suffix = " Z"
+        elif has_m: suffix = " M"
+        base_geom_type_int &= ~EWKB_FLAG_MASK
+    # Fallback to check for standard WKB dimensional ranges.
     else:
-        geom_type_int = int.from_bytes(wkb_bytes[1:5], byteorder="little", signed=False)
+        if 3000 <= geom_type_int < 4000:
+            suffix = " ZM"
+            base_geom_type_int -= 3000
+        elif 2000 <= geom_type_int < 3000:
+            suffix = " M"
+            base_geom_type_int -= 2000
+        elif 1000 <= geom_type_int < 2000:
+            suffix = " Z"
+            base_geom_type_int -= 1000
 
-    # EWKB: Remove high bits (PostGIS style)
-    # 0x20000000 → SRID flag
-    # 0x80000000 → other flag
-    base_geom_type_int = geom_type_int & 0xFFFF  # lower 16 bits → geometry type
-    dimensional_flag = geom_type_int - base_geom_type_int
-
-    # Dimensionality
-    if dimensional_flag >= 3000:
-        suffix = " ZM"
-    elif dimensional_flag >= 2000:
-        suffix = " M"
-    elif dimensional_flag >= 1000:
-        suffix = " Z"
-    else:
-        suffix = ""
-
-    geom_type_str = (
-        WKB_GEOM_TYPES.get(base_geom_type_int, f"Unknown({base_geom_type_int})")
-        + suffix
-    )
-    return geom_type_str
+    geom_type_str = WKB_GEOM_TYPES.get(base_geom_type_int, f"Unknown({base_geom_type_int})")
+    return geom_type_str + suffix
 
 
 # Register UDF
