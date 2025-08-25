@@ -209,40 +209,36 @@ def generate_contours_wkb(
 
 @pandas_udf(BinaryType())
 def generate_contours_udf(
-    raster_series: Iterator[pd.Series], contour_interval: float = 10, contour_base: float = 0
-) -> Iterator[pd.Series]:
+    raster_series: pd.Series, interval_series: pd.Series, base_series: pd.Series
+) -> pd.Series:
     """
     A Pandas UDF that generates contour lines from raster data.
 
-    This function processes batches of raster data (as binary blobs), generating contour 
-    lines at specified intervals and base levels.
-    It uses GDAL for raster processing and outputs the contours as WKB (Well-Known Binary) 
-    geometries.
+    This is a Scalar Pandas UDF that processes batches of data.
 
     Parameters:
-        raster_series (Iterator[pd.Series]): An iterator over pandas Series, each containing 
-        raster data as binary objects.
-        contour_interval (float): The interval between contour lines.
-        contour_base (float): The base elevation for the contours.
+        raster_series (pd.Series): A pandas Series of raster data as binary objects.
+        interval_series (pd.Series): A pandas Series of contour intervals (will be constant).
+        base_series (pd.Series): A pandas Series of contour bases (will be constant).
 
-    Yields:
-        Iterator[pd.Series]: An iterator over pandas Series, each containing the generated 
-        contour lines as binary WKB geometries.
-
-    Raises:
-        Any exceptions raised by GDAL during raster processing.
+    Returns:
+        pd.Series: A pandas Series of generated contour lines as binary WKB geometries.
     """
-    # Set GDAL to raise Python exceptions on errors, making them catchable
+    # Since interval and base are passed via lit(), every value in their series
+    # for a given batch will be the same. We only need the first one.
+    contour_interval = interval_series.iloc[0]
+    contour_base = base_series.iloc[0]
+
+    # Set GDAL to raise Python exceptions on errors
     gdal.UseExceptions()
 
-    for batch in raster_series:
-        # Use .apply() to run the function on each raster binary in the pandas Series
-        results = batch.apply(
-            lambda raster_binary: generate_contours_wkb(
-                raster_binary, interval=contour_interval, base=contour_base
-            )
+    # Use .apply() to run the core logic function on each raster binary in the Series
+    # We pass the dynamically received interval and base to it.
+    return raster_series.apply(
+        lambda raster_binary: generate_contours_wkb(
+            raster_binary, interval=contour_interval, base=contour_base
         )
-        yield results
+    )
 
 
 # Register UDF

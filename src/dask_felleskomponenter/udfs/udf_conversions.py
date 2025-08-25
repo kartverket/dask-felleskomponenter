@@ -61,7 +61,7 @@ def register_all_udfs(spark: SparkSession):
     Args:
         spark (SparkSession): The SparkSession instance to register the UDFs with.
 
-    This function calls individual UDF registration functions to ensure that all necessary UDFs are available 
+    This function calls individual UDF registration functions to ensure that all necessary UDFs are available
     for use in Spark SQL queries and DataFrame operations.
     """
     register_curved_to_linear_wkb_to_spark(spark)
