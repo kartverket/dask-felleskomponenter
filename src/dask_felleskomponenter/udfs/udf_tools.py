@@ -47,6 +47,7 @@ EWKB_M_FLAG = 0x40000000
 EWKB_SRID_FLAG = 0x20000000
 EWKB_FLAG_MASK = EWKB_Z_FLAG | EWKB_M_FLAG | EWKB_SRID_FLAG
 
+
 @udf(StringType())
 def get_wkb_geom_type(wkb_value):
     """
@@ -83,9 +84,12 @@ def get_wkb_geom_type(wkb_value):
     if (geom_type_int & EWKB_FLAG_MASK) != 0:
         has_z = (geom_type_int & EWKB_Z_FLAG) != 0
         has_m = (geom_type_int & EWKB_M_FLAG) != 0
-        if has_z and has_m: suffix = " ZM"
-        elif has_z: suffix = " Z"
-        elif has_m: suffix = " M"
+        if has_z and has_m:
+            suffix = " ZM"
+        elif has_z:
+            suffix = " Z"
+        elif has_m:
+            suffix = " M"
         base_geom_type_int &= ~EWKB_FLAG_MASK
     # Fallback to check for standard WKB dimensional ranges.
     else:
@@ -99,7 +103,9 @@ def get_wkb_geom_type(wkb_value):
             suffix = " Z"
             base_geom_type_int -= 1000
 
-    geom_type_str = WKB_GEOM_TYPES.get(base_geom_type_int, f"Unknown({base_geom_type_int})")
+    geom_type_str = WKB_GEOM_TYPES.get(
+        base_geom_type_int, f"Unknown({base_geom_type_int})"
+    )
     return geom_type_str + suffix
 
 
@@ -146,7 +152,7 @@ def generate_contours_wkb(
     try:
         # Set GDAL to raise Python exceptions on errors
         gdal.UseExceptions()
-    
+
         # Write the raster bytes to GDAL's in-memory virtual filesystem
         gdal.FileFromMemBuffer(in_mem_raster_path, raster_binary)
 

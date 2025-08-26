@@ -29,13 +29,16 @@ from udf_tools import (
     register_all_udfs,
 )
 
+
 # A dummy function to allow `register_all_udfs` to run without error, as its definition was not provided.
 def register_get_wkb_geom_type_to_spark(spark):
     print("Dummy register_get_wkb_geom_type_to_spark called.")
     pass
 
+
 # Make the dummy function available to the imported module
 import udf_tools
+
 udf_tools.register_get_wkb_geom_type_to_spark = register_get_wkb_geom_type_to_spark
 
 output_schema = "plattform_dataprodukter_dev.hoydekurver_tests"
@@ -56,7 +59,9 @@ dtm_table = spark.table("sjo_sehavnivaa.raster_silver.dtm1")
 
 small_tile_selection = [33122116005003, 33122116006003, 33122116005004, 33122116006004]
 
-dtm_selection_df = dtm_table.filter(dtm_table.kartblad_tile_id.isin(small_tile_selection))
+dtm_selection_df = dtm_table.filter(
+    dtm_table.kartblad_tile_id.isin(small_tile_selection)
+)
 
 # Create a temporary view to test the SQL UDF
 dtm_selection_df.createOrReplaceTempView("dtm_selection_for_sql_test")
@@ -75,7 +80,9 @@ register_generate_contours_udf(spark)
 
 # Check if the UDF is in the list of registered functions
 registered_functions = [f.name for f in spark.catalog.listFunctions()]
-assert "generate_contours_udf" in registered_functions, "Test Failed: `generate_contours_udf` was not registered."
+assert (
+    "generate_contours_udf" in registered_functions
+), "Test Failed: `generate_contours_udf` was not registered."
 
 print("Test Passed: `register_generate_contours_udf` successfully registered the UDF.")
 
@@ -107,8 +114,8 @@ assert all(
 ), f"Test Failed: Columns do not match. Expected {expected_columns}, got {contours_sql_df.columns}"
 
 # 2. Check the data type of the generated column
-assert (
-    isinstance(contours_sql_df.schema["contours_wkb_sql"].dataType, BinaryType)
+assert isinstance(
+    contours_sql_df.schema["contours_wkb_sql"].dataType, BinaryType
 ), "Test Failed: The output column `contours_wkb_sql` is not of BinaryType."
 
 # 3. Check if the output is not null for a valid input
@@ -116,7 +123,9 @@ assert (
     contours_sql_df.filter(col("contours_wkb_sql").isNotNull()).count() > 0
 ), "Test Failed: No contours were generated, or all were null."
 
-print("Test Passed: SQL function `generate_contours_udf` executed successfully and passed all assertions.")
+print(
+    "Test Passed: SQL function `generate_contours_udf` executed successfully and passed all assertions."
+)
 display(contours_sql_df)
 
 # COMMAND ----------
@@ -133,7 +142,9 @@ register_all_udfs(spark)
 
 # Check if the UDFs are in the list of registered functions
 registered_functions = [f.name for f in spark.catalog.listFunctions()]
-assert "generate_contours_udf" in registered_functions, "Test Failed: `generate_contours_udf` was not registered by `register_all_udfs`."
+assert (
+    "generate_contours_udf" in registered_functions
+), "Test Failed: `generate_contours_udf` was not registered by `register_all_udfs`."
 # You can add asserts for other UDFs registered by `register_all_udfs` here
 
 print("Test Passed: `register_all_udfs` ran successfully.")

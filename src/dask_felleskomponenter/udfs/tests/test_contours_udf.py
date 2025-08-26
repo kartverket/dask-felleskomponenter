@@ -27,7 +27,9 @@ dtm_table = spark.table("sjo_sehavnivaa.raster_silver.dtm1")
 
 small_tile_selection = [33122116005003, 33122116006003, 33122116005004, 33122116006004]
 
-dtm_selection_df = dtm_table.filter(dtm_table.kartblad_tile_id.isin(small_tile_selection))
+dtm_selection_df = dtm_table.filter(
+    dtm_table.kartblad_tile_id.isin(small_tile_selection)
+)
 
 dtm_selection_df.count()
 
@@ -51,4 +53,3 @@ raster_binary = dtm_selection_df.first()["tile_geotiff"]
 
 # Call the function with the collected raster binary
 contours_wkb = generate_contours_wkb(raster_binary, interval=10, base=0)
-

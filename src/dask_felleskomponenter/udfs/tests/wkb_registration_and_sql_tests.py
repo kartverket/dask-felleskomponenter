@@ -29,17 +29,19 @@ print(f"Added to sys.path for imports: {project_root}")
 from udf_conversions import (
     curved_to_linear_wkb,
     register_curved_to_linear_wkb_to_spark,
-    register_all_udfs as register_all_conversion_udfs, # Using alias to avoid name collision
+    register_all_udfs as register_all_conversion_udfs,  # Using alias to avoid name collision
 )
 
 # Import from udf_tools
 from udf_tools import (
     get_wkb_geom_type,
     register_get_wkb_geom_type_to_spark,
-    register_all_udfs as register_all_tool_udfs, # Using alias to avoid name collision
+    register_all_udfs as register_all_tool_udfs,  # Using alias to avoid name collision
 )
 
-print("Successfully imported UDFs and registration functions from both 'udf_tools' and 'udf_conversions'.")
+print(
+    "Successfully imported UDFs and registration functions from both 'udf_tools' and 'udf_conversions'."
+)
 
 # COMMAND ----------
 
@@ -49,6 +51,7 @@ print("Successfully imported UDFs and registration functions from both 'udf_tool
 # MAGIC Generate a comprehensive test DataFrame with various WKB and EWKB geometry types. This data will be used to test the SQL functions.
 
 # COMMAND ----------
+
 
 def generate_test_data_with_sedona(spark: SparkSession):
     """
@@ -88,13 +91,16 @@ def generate_test_data_with_sedona(spark: SparkSession):
         final_prepared_data.append((row["name"], row["wkt"], row["wkb_bytes"]))
     return final_prepared_data
 
+
 # Generate data and create a temporary view for SQL testing
 test_data = generate_test_data_with_sedona(spark)
-schema = StructType([
-    StructField("name", StringType(), False),
-    StructField("wkt", StringType(), False),
-    StructField("wkb_bytes", BinaryType(), True),
-])
+schema = StructType(
+    [
+        StructField("name", StringType(), False),
+        StructField("wkt", StringType(), False),
+        StructField("wkb_bytes", BinaryType(), True),
+    ]
+)
 test_df = spark.createDataFrame(test_data, schema).cache()
 test_df.createOrReplaceTempView("wkb_test_data")
 
@@ -114,21 +120,37 @@ register_get_wkb_geom_type_to_spark(spark)
 
 # 2. Check for registration
 registered_functions = [f.name for f in spark.catalog.listFunctions()]
-assert "get_wkb_geom_type" in registered_functions, "Test Failed: `get_wkb_geom_type` was not registered."
-print("Test Passed: `register_get_wkb_geom_type_to_spark` successfully registered the UDF.")
+assert (
+    "get_wkb_geom_type" in registered_functions
+), "Test Failed: `get_wkb_geom_type` was not registered."
+print(
+    "Test Passed: `register_get_wkb_geom_type_to_spark` successfully registered the UDF."
+)
 
 # 3. Use the registered UDF in a Spark SQL query
-geom_type_sql_df = spark.sql("""
+geom_type_sql_df = spark.sql(
+    """
     SELECT name, get_wkb_geom_type(wkb_bytes) AS geom_type FROM wkb_test_data
-""")
+"""
+)
 
 # 4. Assertions
-point_z_geom_type = geom_type_sql_df.filter(col("name") == "point_3d_z").first()["geom_type"]
-assert point_z_geom_type == "Point Z", f"Test Failed: Expected 'Point Z', but got '{point_z_geom_type}'."
-ewkb_geom_type = geom_type_sql_df.filter(col("name") == "linestring_3d_z_ewkb").first()["geom_type"]
-assert ewkb_geom_type == "LineString Z", f"Test Failed: Expected 'LineString Z' for EWKB, but got '{ewkb_geom_type}'."
+point_z_geom_type = geom_type_sql_df.filter(col("name") == "point_3d_z").first()[
+    "geom_type"
+]
+assert (
+    point_z_geom_type == "Point Z"
+), f"Test Failed: Expected 'Point Z', but got '{point_z_geom_type}'."
+ewkb_geom_type = geom_type_sql_df.filter(col("name") == "linestring_3d_z_ewkb").first()[
+    "geom_type"
+]
+assert (
+    ewkb_geom_type == "LineString Z"
+), f"Test Failed: Expected 'LineString Z' for EWKB, but got '{ewkb_geom_type}'."
 
-print("Test Passed: SQL function `get_wkb_geom_type` executed successfully and passed all assertions.")
+print(
+    "Test Passed: SQL function `get_wkb_geom_type` executed successfully and passed all assertions."
+)
 display(geom_type_sql_df.select("name", "geom_type"))
 
 # COMMAND ----------
@@ -144,24 +166,36 @@ register_curved_to_linear_wkb_to_spark(spark)
 
 # 2. Check for registration
 registered_functions = [f.name for f in spark.catalog.listFunctions()]
-assert "curved_to_linear_wkb" in registered_functions, "Test Failed: `curved_to_linear_wkb` was not registered."
-print("Test Passed: `register_curved_to_linear_wkb_to_spark` successfully registered the UDF.")
+assert (
+    "curved_to_linear_wkb" in registered_functions
+), "Test Failed: `curved_to_linear_wkb` was not registered."
+print(
+    "Test Passed: `register_curved_to_linear_wkb_to_spark` successfully registered the UDF."
+)
 
 # 3. Use both registered UDFs in a Spark SQL query for verification
-linear_sql_df = spark.sql("""
+linear_sql_df = spark.sql(
+    """
     SELECT
         name,
         get_wkb_geom_type(wkb_bytes) AS original_type,
         get_wkb_geom_type(curved_to_linear_wkb(wkb_bytes, 5.0)) AS converted_type
     FROM wkb_test_data
-""")
+"""
+)
 
 # 4. Assertions
 curvepoly_result = linear_sql_df.filter(col("name") == "curvepolygon_2d").first()
-assert curvepoly_result["original_type"] == "CurvePolygon", f"Test Failed: Expected original type 'CurvePolygon', but got '{curvepoly_result['original_type']}'."
-assert curvepoly_result["converted_type"] == "Polygon", f"Test Failed: Expected converted type 'Polygon', but got '{curvepoly_result['converted_type']}'."
+assert (
+    curvepoly_result["original_type"] == "CurvePolygon"
+), f"Test Failed: Expected original type 'CurvePolygon', but got '{curvepoly_result['original_type']}'."
+assert (
+    curvepoly_result["converted_type"] == "Polygon"
+), f"Test Failed: Expected converted type 'Polygon', but got '{curvepoly_result['converted_type']}'."
 
-print("Test Passed: SQL function `curved_to_linear_wkb` executed successfully and passed all assertions.")
+print(
+    "Test Passed: SQL function `curved_to_linear_wkb` executed successfully and passed all assertions."
+)
 display(linear_sql_df)
 
 # COMMAND ----------
@@ -182,10 +216,16 @@ register_all_conversion_udfs(spark)
 # Check that UDFs from both modules are now registered
 registered_functions = [f.name for f in spark.catalog.listFunctions()]
 
-assert "get_wkb_geom_type" in registered_functions, "Test Failed: `get_wkb_geom_type` was not registered by `register_all_tool_udfs`."
-assert "curved_to_linear_wkb" in registered_functions, "Test Failed: `curved_to_linear_wkb` was not registered by `register_all_conversion_udfs`."
+assert (
+    "get_wkb_geom_type" in registered_functions
+), "Test Failed: `get_wkb_geom_type` was not registered by `register_all_tool_udfs`."
+assert (
+    "curved_to_linear_wkb" in registered_functions
+), "Test Failed: `curved_to_linear_wkb` was not registered by `register_all_conversion_udfs`."
 
-print("\nTest Passed: Both `register_all_udfs` functions ran successfully, registering UDFs from their respective modules.")
+print(
+    "\nTest Passed: Both `register_all_udfs` functions ran successfully, registering UDFs from their respective modules."
+)
 
 # COMMAND ----------
 
