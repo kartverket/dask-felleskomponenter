@@ -144,6 +144,9 @@ def generate_contours_wkb(
     ogr_ds = None
 
     try:
+        # Set GDAL to raise Python exceptions on errors
+        gdal.UseExceptions()
+    
         # Write the raster bytes to GDAL's in-memory virtual filesystem
         gdal.FileFromMemBuffer(in_mem_raster_path, raster_binary)
 
@@ -193,8 +196,7 @@ def generate_contours_wkb(
             return None
 
     except Exception as e:
-        # On any error, return None to indicate failure for this row
-        print(f"Error processing raster: {e}")
+        print(f"Error generating contours: {e}")
         return None
 
     finally:
@@ -218,19 +220,16 @@ def generate_contours_udf(
 
     Parameters:
         raster_series (pd.Series): A pandas Series of raster data as binary objects.
-        interval_series (pd.Series): A pandas Series of contour intervals (will be constant).
-        base_series (pd.Series): A pandas Series of contour bases (will be constant).
+        interval_series (pd.Series): A pandas Series of contour intervals (will be constant, use lit).
+        base_series (pd.Series): A pandas Series of contour bases (will be constant, use lit).
 
     Returns:
         pd.Series: A pandas Series of generated contour lines as binary WKB geometries.
     """
     # Since interval and base are passed via lit(), every value in their series
     # for a given batch will be the same. We only need the first one.
-    contour_interval = interval_series.iloc[0]
-    contour_base = base_series.iloc[0]
-
-    # Set GDAL to raise Python exceptions on errors
-    gdal.UseExceptions()
+    contour_interval = float(interval_series.iloc[0])
+    contour_base = float(base_series.iloc[0])
 
     # Use .apply() to run the core logic function on each raster binary in the Series
     # We pass the dynamically received interval and base to it.
