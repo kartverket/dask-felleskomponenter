@@ -13,8 +13,8 @@ EWKB_SRID_FLAG = 0x20000000
 def curved_to_linear_wkb(geometry, dfMaxAngleStepSizeDegrees: float = 0.0):
     """
     Converts a curved geometry in WKB/EWKB format to its linearized equivalent.
-    This version is fully EWKB-aware: it removes both the SRID flag and value
-    before passing the geometry to OGR for reliable processing.
+    This version is EWKB-aware: it removes both the SRID flag and value
+    before passing the geometry to OGR for processing.
     """
     if not isinstance(geometry, (bytes, bytearray)):
         return None
@@ -48,7 +48,7 @@ def curved_to_linear_wkb(geometry, dfMaxAngleStepSizeDegrees: float = 0.0):
         if geometry_serialized is None:
             return None
 
-        # Defensively cast the angle to a float
+        # Cast the angle to a float
         angle = float(
             dfMaxAngleStepSizeDegrees if dfMaxAngleStepSizeDegrees is not None else 0.0
         )

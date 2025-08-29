@@ -11,7 +11,7 @@ import os
 import sys
 from pathlib import Path
 
-from pyspark.sql.functions import col, lit
+from pyspark.sql.functions import col
 from pyspark.sql.types import BinaryType
 
 # Local imports for testing
@@ -22,24 +22,10 @@ if str(project_root) not in sys.path:
 print(f"Added to sys.path for imports: {project_root}")
 
 # --- Import UDFs and Registration function ---
-# Assuming your UDFs are in a file named 'udf_tools.py' in the project root
 from udf_tools import (
-    generate_contours_udf,
     register_generate_contours_udf,
     register_all_udfs,
 )
-
-
-# A dummy function to allow `register_all_udfs` to run without error, as its definition was not provided.
-def register_get_wkb_geom_type_to_spark(spark):
-    print("Dummy register_get_wkb_geom_type_to_spark called.")
-    pass
-
-
-# Make the dummy function available to the imported module
-import udf_tools
-
-udf_tools.register_get_wkb_geom_type_to_spark = register_get_wkb_geom_type_to_spark
 
 output_schema = "plattform_dataprodukter_dev.hoydekurver_tests"
 

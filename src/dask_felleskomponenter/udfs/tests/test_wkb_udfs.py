@@ -55,7 +55,7 @@ def generate_test_data_with_sedona(spark: SparkSession):
 
     final_prepared_data = []
 
-    # --- Part 1: Generate a complete baseline set using OGR (standard WKB) ---
+    # Generate a complete baseline set using OGR (standard WKB) ---
     print("--- Generating baseline WKB data using OGR ---")
     for name, wkt_string in wkt_test_cases.items():
         geom = ogr.CreateGeometryFromWkt(wkt_string)
@@ -64,7 +64,7 @@ def generate_test_data_with_sedona(spark: SparkSession):
         final_prepared_data.append((name, wkt_string, wkb_hex, wkb_bytes))
     print(f"Generated {len(final_prepared_data)} baseline WKB test cases.")
 
-    # --- Part 2: Generate an additional set of EWKB using Sedona for non-curved types ---
+    # Generate an additional set of EWKB using Sedona for non-curved types ---
     print("\n--- Generating additional EWKB data using Sedona ---")
     CURVED_KEYWORDS = [
         "CIRCULARSTRING",

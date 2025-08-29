@@ -14,7 +14,7 @@ from pathlib import Path
 from osgeo import ogr
 from pyspark.sql import SparkSession
 from pyspark.sql.types import StructType, StructField, StringType, BinaryType
-from pyspark.sql.functions import expr, col, lit
+from pyspark.sql.functions import expr, col
 
 # Local imports for testing
 project_root = Path(os.getcwd()).parent
@@ -27,14 +27,12 @@ print(f"Added to sys.path for imports: {project_root}")
 
 # Import from udf_conversions
 from udf_conversions import (
-    curved_to_linear_wkb,
     register_curved_to_linear_wkb_to_spark,
     register_all_udfs as register_all_conversion_udfs,  # Using alias to avoid name collision
 )
 
 # Import from udf_tools
 from udf_tools import (
-    get_wkb_geom_type,
     register_get_wkb_geom_type_to_spark,
     register_all_udfs as register_all_tool_udfs,  # Using alias to avoid name collision
 )
@@ -72,13 +70,13 @@ def generate_test_data_with_sedona(spark: SparkSession):
         "point_empty": "POINT EMPTY",
     }
     final_prepared_data = []
-    # --- Part 1: Generate a complete baseline set using OGR (standard WKB) ---
+    # --- Generate a complete baseline set using OGR (standard WKB) ---
     for name, wkt_string in wkt_test_cases.items():
         geom = ogr.CreateGeometryFromWkt(wkt_string)
         wkb_bytes = geom.ExportToWkb()
         final_prepared_data.append((name, wkt_string, wkb_bytes))
 
-    # --- Part 2: Generate an additional set of EWKB using Sedona for non-curved types ---
+    # --- Generate an additional set of EWKB using Sedona for non-curved types ---
     sedona_process_list = [
         ("point_2d_ewkb", "POINT (10 20)"),
         ("linestring_3d_z_ewkb", "LINESTRING Z (10 10 5, 20 20 10)"),
@@ -115,10 +113,10 @@ display(test_df)
 # MAGIC This test verifies that the `register_get_wkb_geom_type_to_spark` function correctly registers the UDF and that it can be successfully called from SQL.
 
 # COMMAND ----------
-# 1. Register the UDF from udf_tools
+# Register the UDF from udf_tools
 register_get_wkb_geom_type_to_spark(spark)
 
-# 2. Check for registration
+# Check for registration
 registered_functions = [f.name for f in spark.catalog.listFunctions()]
 assert (
     "get_wkb_geom_type" in registered_functions
@@ -127,14 +125,14 @@ print(
     "Test Passed: `register_get_wkb_geom_type_to_spark` successfully registered the UDF."
 )
 
-# 3. Use the registered UDF in a Spark SQL query
+# Use the registered UDF in a Spark SQL query
 geom_type_sql_df = spark.sql(
     """
     SELECT name, get_wkb_geom_type(wkb_bytes) AS geom_type FROM wkb_test_data
 """
 )
 
-# 4. Assertions
+# Assertions
 point_z_geom_type = geom_type_sql_df.filter(col("name") == "point_3d_z").first()[
     "geom_type"
 ]
@@ -161,10 +159,10 @@ display(geom_type_sql_df.select("name", "geom_type"))
 # MAGIC This test verifies the registration and SQL functionality of the `curved_to_linear_wkb` UDF. It depends on `get_wkb_geom_type` from the previous test.
 
 # COMMAND ----------
-# 1. Register the UDF from udf_conversions
+# Register the UDF from udf_conversions
 register_curved_to_linear_wkb_to_spark(spark)
 
-# 2. Check for registration
+# Check for registration
 registered_functions = [f.name for f in spark.catalog.listFunctions()]
 assert (
     "curved_to_linear_wkb" in registered_functions
@@ -173,7 +171,7 @@ print(
     "Test Passed: `register_curved_to_linear_wkb_to_spark` successfully registered the UDF."
 )
 
-# 3. Use both registered UDFs in a Spark SQL query for verification
+# Use both registered UDFs in a Spark SQL query for verification
 linear_sql_df = spark.sql(
     """
     SELECT
@@ -184,7 +182,7 @@ linear_sql_df = spark.sql(
 """
 )
 
-# 4. Assertions
+# Assertions
 curvepoly_result = linear_sql_df.filter(col("name") == "curvepolygon_2d").first()
 assert (
     curvepoly_result["original_type"] == "CurvePolygon"

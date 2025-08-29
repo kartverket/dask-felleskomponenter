@@ -1,6 +1,5 @@
 import uuid
 import pandas as pd
-from typing import Iterator
 from osgeo import gdal, ogr
 
 from pyspark.sql import SparkSession
@@ -54,7 +53,7 @@ def get_wkb_geom_type(wkb_value):
     Extracts the geometry type from a WKB or EWKB value, correctly handling
     hex string, bytes, and bytearray inputs from Spark.
     """
-    # Step 1: Unambiguously get the input into a `bytes` object.
+    # Unambiguously get the input into a `bytes` object.
     if wkb_value is None:
         return "Invalid (null input)"
 
@@ -69,11 +68,11 @@ def get_wkb_geom_type(wkb_value):
     else:
         return f"Invalid (unsupported type: {type(wkb_value).__name__})"
 
-    # Step 2: Validate the bytes object.
+    # Validate the bytes object.
     if len(wkb_bytes) < 5:
         return "Invalid (too short)"
 
-    # Step 3: Parse the validated bytes.
+    # Parse the validated bytes.
     byte_order = "big" if wkb_bytes[0] == 0 else "little"
     geom_type_int = int.from_bytes(wkb_bytes[1:5], byteorder=byte_order, signed=False)
 
@@ -250,7 +249,7 @@ def generate_contours_udf(
 def register_generate_contours_udf(spark: SparkSession):
     """
     Registers the 'generate_contours_udf' user-defined function (UDF) with the provided SparkSession.
-    This makes the 'generate_contours_udf' UDF available as a SQL function in Spark SQL queries.
+    This makes the UDF available as a SQL function in Spark SQL queries.
 
     Args:
         spark (SparkSession): The SparkSession instance to register the UDF with.
