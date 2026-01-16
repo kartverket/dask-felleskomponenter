@@ -40,7 +40,7 @@ class PostgresTargetConfig:
 
         if missing_vars:
             raise RuntimeError(
-                f"Missing required environment variables for SSL: {', '.join(missing_vars)}. "
+                f"Missing required environment variables for  making SSL connection to host {self.host}: {', '.join(missing_vars)}. "
                 "Ensure environment variables are set on the cluster for init script to run successfully."
             )
 
