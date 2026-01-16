@@ -66,8 +66,12 @@ jobs:
         run: |
           git config --local user.name "GitHub Actions"
           git config --local user.email "noreply@kartverket.no"
-          git commit -am "Bump dask-felleskomponenter PyPI package version to ${{ github.event.inputs.version }}"
-          git push
+          if [[ -n $(git status --porcelain) ]]; then
+            git commit -am "Bump dask-felleskomponenter PyPI package version to ${{ github.event.inputs.version }}"
+            git push
+          else
+            echo "Ingen endringer detektert. Skipper commit og push."
+          fi
 
       - name: Build the package
         run: |
