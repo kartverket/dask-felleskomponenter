@@ -40,7 +40,8 @@ class PostgresTargetConfig:
 
         if missing_vars:
             raise RuntimeError(
-                f"Missing required environment variables for  making SSL connection to host {self.host}: {', '.join(missing_vars)}. "
+                f"Missing required environment variables for making SSL connection to host {self.host}:"
+                f"\t{', '.join(missing_vars)}."
                 "Ensure environment variables are set on the cluster for init script to run successfully."
             )
 
@@ -54,7 +55,9 @@ class PostgresTargetConfig:
                 )
 
         spark = SparkSession.getActiveSession() or SparkSession.builder.getOrCreate()
-        security_mode = spark.conf.get("spark.databricks.clusterUsageTags.dataSecurityMode", "UNKNOWN").upper()
+        security_mode = spark.conf.get(
+                "spark.databricks.clusterUsageTags.dataSecurityMode", "UNKNOWN"
+            ).upper()
         if security_mode == "USER_ISOLATION":
             raise RuntimeError(
                 "CRITICAL: This code requires 'Single User' or 'No Isolation Shared' mode. "
