@@ -4,13 +4,13 @@ build-backend = 'setuptools.build_meta'
 
 [project]
 name = "dask-felleskomponenter"
-version = "0.1.11"
+version = "0.1.12-a1"
 authors = [
   { name="Dataplattform@Statens Kartverk", email="dataplattform@kartverket.no" },
 ]
 description = "Felleskomponenter på DASK"
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.10, <3.14"
 classifiers = [
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
@@ -18,9 +18,10 @@ classifiers = [
 ]
 dependencies = [
     "requests",
-    "databricks-connect"
+    "databricks-connect",
+    "pyspark==3.5.8",
+    "psycopg==3.3.2",
 ]
-
 
 [project.urls]
 Homepage = "https://github.com/kartverket/dask-felleskomponenter"
@@ -28,3 +29,8 @@ Issues = "https://github.com/kartverket/dask-felleskomponenter/issues"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[dependency-groups]
+dev = [
+    "black (>=25.12.0,<26.0.0)"
+]
