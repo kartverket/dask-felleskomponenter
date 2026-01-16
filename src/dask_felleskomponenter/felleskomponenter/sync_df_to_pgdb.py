@@ -30,7 +30,7 @@ class PostgresTargetConfig:
     def __post_init__(self):
         self._validate_environment()
 
-    def _validate_environment(self, spark: SparkSession) -> None:
+    def _validate_environment(self) -> None:
         """
         Validates that the runtime environment has the necessary SSL configuration.
         Raises RuntimeError if env vars are missing or certificate files are not found.
@@ -53,6 +53,7 @@ class PostgresTargetConfig:
                     f"Certificate file defined in {var} not found at path: {path}. Check init script execution."
                 )
 
+        spark = SparkSession.getActiveSession() or SparkSession.builder.getOrCreate()
         security_mode = spark.conf.get("spark.databricks.clusterUsageTags.dataSecurityMode", "UNKNOWN").upper()
         if security_mode == "USER_ISOLATION":
             raise RuntimeError(
@@ -74,7 +75,6 @@ class PostgresSyncManager:
         self.config = config
 
         self.spark = spark or SparkSession.builder.getOrCreate()
-        self.config.validate_environment(self.spark)
 
         self.certs = {
             "ca": os.environ["CLOUD_SQL_CA"],
