@@ -18,6 +18,7 @@ class PostgresTargetConfig:
     - cert
     - key
     """
+
     host: str
     dbname: str
     user: str
@@ -45,7 +46,11 @@ class PostgresTargetConfig:
                 "Ensure environment variables are set on the cluster for init script to run successfully."
             )
 
-        required_init_script_setup_envs = ["CLOUD_SQL_CA", "CLOUD_SQL_CERT", "CLOUD_SQL_KEY"]
+        required_init_script_setup_envs = [
+            "CLOUD_SQL_CA",
+            "CLOUD_SQL_CERT",
+            "CLOUD_SQL_KEY",
+        ]
 
         for var in required_init_script_setup_envs:
             path = os.environ[var]
@@ -56,8 +61,8 @@ class PostgresTargetConfig:
 
         spark = SparkSession.getActiveSession() or SparkSession.builder.getOrCreate()
         security_mode = spark.conf.get(
-                "spark.databricks.clusterUsageTags.dataSecurityMode", "UNKNOWN"
-            ).upper()
+            "spark.databricks.clusterUsageTags.dataSecurityMode", "UNKNOWN"
+        ).upper()
         if security_mode == "USER_ISOLATION":
             raise RuntimeError(
                 "CRITICAL: This code requires 'Single User' or 'No Isolation Shared' mode. "
@@ -74,7 +79,9 @@ class PostgresSyncManager:
     'No Isolation Shared' security mode to access SSL certificates.
     """
 
-    def __init__(self, config: PostgresTargetConfig, spark: Optional[SparkSession] = None):
+    def __init__(
+        self, config: PostgresTargetConfig, spark: Optional[SparkSession] = None
+    ):
         self.config = config
 
         self.spark = spark or SparkSession.builder.getOrCreate()
@@ -82,22 +89,22 @@ class PostgresSyncManager:
         self.certs = {
             "ca": os.environ["CLOUD_SQL_CA"],
             "cert": os.environ["CLOUD_SQL_CERT"],
-            "key": os.environ["CLOUD_SQL_KEY"]
+            "key": os.environ["CLOUD_SQL_KEY"],
         }
 
         self.jdbc_url = f"jdbc:postgresql://{self.config.host}/{self.config.dbname}"
 
     @classmethod
     def from_databricks_secrets(
-            cls,
-            scope: str,
-            host_key: str,
-            password_key: str,
-            dbname: str,
-            user: str,
-            staging_table: str,
-            target_table: str,
-            **kwargs
+        cls,
+        scope: str,
+        host_key: str,
+        password_key: str,
+        dbname: str,
+        user: str,
+        staging_table: str,
+        target_table: str,
+        **kwargs,
     ) -> "PostgresSyncManager":
         """
         Factory method to initialize the manager using credentials stored in Databricks Secrets.
@@ -128,7 +135,9 @@ class PostgresSyncManager:
         try:
             dbutils = DBUtils(spark)
         except ImportError:
-            raise RuntimeError("DBUtils not available. Must be run within Databricks Runtime.")
+            raise RuntimeError(
+                "DBUtils not available. Must be run within Databricks Runtime."
+            )
 
         host = dbutils.secrets.get(scope=scope, key=host_key)
         password = dbutils.secrets.get(scope=scope, key=password_key)
@@ -140,28 +149,30 @@ class PostgresSyncManager:
             password=password,
             staging_table=staging_table,
             target_table=target_table,
-            **kwargs
+            **kwargs,
         )
         return cls(config, spark)
 
     def _run_sql_command(self, sql: str) -> int:
 
         with psycopg.connect(
-                host=self.config.host,
-                dbname=self.config.dbname,
-                user=self.config.user,
-                password=self.config.password,
-                sslmode="verify-ca",
-                sslrootcert=self.certs["ca"],
-                sslcert=self.certs["cert"],
-                sslkey=self.certs["key"]
+            host=self.config.host,
+            dbname=self.config.dbname,
+            user=self.config.user,
+            password=self.config.password,
+            sslmode="verify-ca",
+            sslrootcert=self.certs["ca"],
+            sslcert=self.certs["cert"],
+            sslkey=self.certs["key"],
         ) as conn:
             with conn.cursor() as cur:
                 cur.execute(sql)
                 return cur.rowcount
 
     def _write_to_staging(self, df: DataFrame):
-        print(f"Data Transfer: Writing {df.count()} rows to {self.config.staging_table}")
+        print(
+            f"Data Transfer: Writing {df.count()} rows to {self.config.staging_table}"
+        )
 
         jdbc_props = {
             "user": self.config.user,
@@ -171,17 +182,18 @@ class PostgresSyncManager:
             "sslmode": "verify-ca",
             "sslrootcert": self.certs["ca"],
             "sslcert": self.certs["cert"],
-            "sslkey": self.certs["key"]
+            "sslkey": self.certs["key"],
         }
 
-        (df.write
-         .format("jdbc")
-         .option("url", self.jdbc_url)
-         .option("dbtable", self.config.staging_table)
-         .options(**jdbc_props)
-         .mode("overwrite")
-         .option("truncate", "true")
-         .save())
+        (
+            df.write.format("jdbc")
+            .option("url", self.jdbc_url)
+            .option("dbtable", self.config.staging_table)
+            .options(**jdbc_props)
+            .mode("overwrite")
+            .option("truncate", "true")
+            .save()
+        )
 
     def _fmt_col(self, col_name: str, table_name: str, geometry_cols: List[str]) -> str:
         col_ref = f'{table_name}."{col_name}"'
@@ -193,7 +205,9 @@ class PostgresSyncManager:
         print(f"Executing SNAPSHOT OVERWRITE on {self.config.target_table}")
 
         cols_list = ", ".join([f'"{c}"' for c in cols])
-        sel_list = ", ".join([self._fmt_col(c, self.config.staging_table, geom_cols) for c in cols])
+        sel_list = ", ".join(
+            [self._fmt_col(c, self.config.staging_table, geom_cols) for c in cols]
+        )
 
         sql = f"""
         BEGIN;
@@ -214,7 +228,9 @@ class PostgresSyncManager:
         join_condition = " AND ".join([f"{tgt}.{k} = {stg}.{k}" for k in keys])
 
         update_cols = [c for c in cols if c not in keys and c != ut_col]
-        update_set = ", ".join([f'"{c}" = {self._fmt_col(c, stg, geom_cols)}' for c in update_cols])
+        update_set = ", ".join(
+            [f'"{c}" = {self._fmt_col(c, stg, geom_cols)}' for c in update_cols]
+        )
 
         insert_cols = [c for c in cols if c != ut_col]
         insert_names = ", ".join([f'"{c}"' for c in insert_cols])
@@ -236,11 +252,11 @@ class PostgresSyncManager:
         print(f"Merge Complete. Rows affected: {rows}")
 
     def sync(
-            self,
-            df: DataFrame,
-            mode: str = "snapshot",
-            merge_keys: Optional[List[str]] = None,
-            geometry_cols: Optional[List[str]] = None
+        self,
+        df: DataFrame,
+        mode: str = "snapshot",
+        merge_keys: Optional[List[str]] = None,
+        geometry_cols: Optional[List[str]] = None,
     ):
         """
         Synchronizes a Spark DataFrame to PostgreSQL.
