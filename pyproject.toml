@@ -10,7 +10,7 @@ authors = [
 ]
 description = "Felleskomponenter på DASK"
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.10, <3.14"
 classifiers = [
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
@@ -18,7 +18,9 @@ classifiers = [
 ]
 dependencies = [
     "requests",
-    "databricks-connect"
+    "databricks-connect",
+    "pyspark==3.5.8",
+    "psycopg==3.3.2",
 ]
 
 
