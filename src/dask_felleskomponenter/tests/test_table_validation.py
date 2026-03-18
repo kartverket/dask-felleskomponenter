@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import MagicMock
 
-from src.dask_felleskomponenter.governance.main import Metadata, TableMetadata
+from dask_felleskomponenter.governance.main import Metadata, TableMetadata
 
 import json
 

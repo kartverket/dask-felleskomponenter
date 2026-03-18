@@ -14,7 +14,10 @@ if str(project_root) not in sys.path:
 print(f"Added to sys.path for imports: {project_root}")
 
 # --- Import UDFs and Registration function ---
-from udf_tools import generate_contours_udf, generate_contours_wkb
+from dask_felleskomponenter.udfs.udf_tools import (
+    generate_contours_udf,
+    generate_contours_wkb,
+)
 
 output_schema = "plattform_dataprodukter_dev.hoydekurver"
 
