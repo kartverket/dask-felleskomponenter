@@ -126,11 +126,9 @@ print(
 )
 
 # Use the registered UDF in a Spark SQL query
-geom_type_sql_df = spark.sql(
-    """
+geom_type_sql_df = spark.sql("""
     SELECT name, get_wkb_geom_type(wkb_bytes) AS geom_type FROM wkb_test_data
-"""
-)
+""")
 
 # Assertions
 point_z_geom_type = geom_type_sql_df.filter(col("name") == "point_3d_z").first()[
@@ -172,15 +170,13 @@ print(
 )
 
 # Use both registered UDFs in a Spark SQL query for verification
-linear_sql_df = spark.sql(
-    """
+linear_sql_df = spark.sql("""
     SELECT
         name,
         get_wkb_geom_type(wkb_bytes) AS original_type,
         get_wkb_geom_type(curved_to_linear_wkb(wkb_bytes, 5.0)) AS converted_type
     FROM wkb_test_data
-"""
-)
+""")
 
 # Assertions
 curvepoly_result = linear_sql_df.filter(col("name") == "curvepolygon_2d").first()

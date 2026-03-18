@@ -6,7 +6,6 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import udf, pandas_udf
 from pyspark.sql.types import StringType, BinaryType
 
-
 # ----- WKB GEOMETRY TYPE UDF -----
 
 # WKB Geometry type lookup
