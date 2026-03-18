@@ -82,14 +82,12 @@ print("Test Passed: `register_generate_contours_udf` successfully registered the
 # COMMAND ----------
 
 # Use the registered UDF in a Spark SQL query
-contours_sql_df = spark.sql(
-    """
+contours_sql_df = spark.sql("""
     SELECT
         kartblad_tile_id,
         generate_contours_udf(tile_geotiff, 10, 0) AS contours_wkb_sql
     FROM dtm_selection_for_sql_test
-    """
-)
+    """)
 
 # --- Assertions ---
 

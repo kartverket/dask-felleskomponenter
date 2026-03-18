@@ -4,7 +4,7 @@ build-backend = 'setuptools.build_meta'
 
 [project]
 name = "dask-felleskomponenter"
-version = "0.1.12"
+version = "0.2.0"
 authors = [
   { name="Dataplattform@Statens Kartverk", email="dataplattform@kartverket.no" },
 ]
@@ -19,8 +19,8 @@ classifiers = [
 dependencies = [
     "requests",
     "databricks-connect",
-    "pyspark==3.5.8",
-    "psycopg==3.3.2",
+    "pyspark",
+    "psycopg",
 ]
 
 [project.urls]
