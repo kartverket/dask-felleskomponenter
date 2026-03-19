@@ -26,6 +26,7 @@ dependencies = [
     "pyspark>=4.1.1",
     "zstandard>=0.25.0",
     "datacontract-cli[databricks] (>=0.11.6,<0.12.0)",
+    "typer (>=0.24.1,<0.25.0)",
 ]
 
 [project.urls]
