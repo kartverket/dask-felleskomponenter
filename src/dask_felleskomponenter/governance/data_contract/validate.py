@@ -36,7 +36,8 @@ def _validate_data_contracts(files: list[Path] | list[str]) -> list[Run]:
                 data_contract = DataContract(data_contract_file=str(file))
         elif isinstance(file, str):
             data_contract = DataContract(data_contract_str=file)
-            results.append(data_contract.test())
+
+        results.append(data_contract.test())
     return results
 
 
