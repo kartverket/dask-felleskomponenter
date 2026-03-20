@@ -50,14 +50,24 @@ def cli(
         list[Path], typer.Argument(help="Path to data contract files to validate.")
     ],
     databricks_token: Annotated[
-        str,
-        typer.Argument(
-            help="Personal token to be used for data contract validation. Needs SQL scope."
+        str | None,
+        typer.Option(
+            "-t",
+            "--token",
+            help="Personal token to be used for data contract validation. Needs SQL scope.",
         ),
-    ],
+    ] = None,
+    databricks_service_account: Annotated[
+        str | None,
+        typer.Option(
+            "-sa",
+            "--service-account",
+            help="Service account to be used for data contract validation. You need to be already authenticated as this service account using the gcloud cli.",
+        ),
+    ] = None,
 ) -> None:
     """Validate data contracts against the Kartverket spec and Databricks data."""
-    _set_token(token=databricks_token)
+    _set_token(token=databricks_token, service_account=databricks_service_account)
     results = _validate_data_contracts(files=data_contract_paths)
     for res in results:
         if not res.has_passed():
