@@ -4,7 +4,7 @@ build-backend = 'setuptools.build_meta'
 
 [project]
 name = "dask-felleskomponenter"
-version = "0.2.1-a1"
+version = "0.2.1-a2"
 authors = [
   { name="Dataplattform@Statens Kartverk", email="dataplattform@kartverket.no" },
 ]
@@ -29,6 +29,9 @@ dependencies = [
     "typer (>=0.24.1,<0.25.0)",
 ]
 
+[project.scripts]
+validate-data-contract = "dask_felleskomponenter.governance.data_contract.validate:app"
+
 [project.urls]
 Homepage = "https://github.com/kartverket/dask-felleskomponenter"
 Issues = "https://github.com/kartverket/dask-felleskomponenter/issues"
@@ -36,8 +39,7 @@ Issues = "https://github.com/kartverket/dask-felleskomponenter/issues"
 [tool.setuptools.packages.find]
 where = ["src"]
 
-[tool.poetry.scripts]
-validate-data-contract = "dask_felleskomponenter.governance.data_contract.validate:app"
+
 
 [dependency-groups]
 dev = [
