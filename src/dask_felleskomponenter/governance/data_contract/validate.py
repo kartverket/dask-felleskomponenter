@@ -2,12 +2,19 @@
 A script to validate a datacontract against the defined Kartverket-spec and the existing data in Databricks.
 """
 
+from open_data_contract_standard.model import OpenDataContractStandard
+
 import os
 import typer
 from typing import Annotated
 from databricks.sdk import WorkspaceClient
 from datacontract.data_contract import DataContract
-from datacontract.model.run import Run
+from datacontract.model.run import Run, Check
+from dask_felleskomponenter.governance.data_contract.checks import (
+    check_id_uuid,
+    check_status_enum,
+    check_version_semver,
+)
 
 from pathlib import Path
 
@@ -26,18 +33,42 @@ def _set_token(token: str | None = None, service_account: str | None = None) -> 
     os.environ["DATACONTRACT_DATABRICKS_TOKEN"] = token
 
 
+def _create_datacontract_object(file: Path | str) -> DataContract:
+    """Create a DataContract object from the provided file."""
+    if isinstance(file, Path):
+        if file.suffix in [".yml", ".yaml"]:
+            return DataContract(data_contract_file=str(file))
+    elif isinstance(file, str):
+        return DataContract(data_contract_str=file)
+    raise ValueError(
+        f"Unsupported file type for {file}. Only .yml and .yaml are supported."
+    )
+
+
+def _validate_kartverket_spec(data_contract: OpenDataContractStandard) -> list[Check]:
+    """Validate the data contract against the Kartverket spec."""
+    checks = list[Check]()
+    checks.append(check_id_uuid(data_contract))
+    checks.append(check_status_enum(data_contract))
+    checks.append(check_version_semver(data_contract))
+    return checks
+
+
 def _validate_data_contracts(files: list[Path] | list[str]) -> list[Run]:
     """Validate the provided data contract files."""
     results = list[Run]()
     for file in files:
         typer.echo(f"Validating data contract: {file}")
-        if isinstance(file, Path):
-            if file.suffix in [".yml", ".yaml"]:
-                data_contract = DataContract(data_contract_file=str(file))
-        elif isinstance(file, str):
-            data_contract = DataContract(data_contract_str=file)
-
-        results.append(data_contract.test())
+        data_contract = _create_datacontract_object(file)
+        run = data_contract.test()
+        kartverket_checks = _validate_kartverket_spec(
+            data_contract=data_contract.get_data_contract()
+        )
+        if run.checks:
+            run.checks.extend(kartverket_checks)
+        else:
+            run.checks = kartverket_checks
+        results.append(run)
     return results
 
 
@@ -74,8 +105,5 @@ def cli(
     """Validate data contracts against the Kartverket spec and Databricks data."""
     _set_token(token=databricks_token, service_account=databricks_service_account)
     results = _validate_data_contracts(files=data_contract_paths)
-    for res in results:
-        # if not res.has_passed():
-        print(res.pretty_logs())
     if any(not res.has_passed() for res in results):
         raise Exception("Some data contracts failed validation. See logs for details.")

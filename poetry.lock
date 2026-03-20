@@ -2383,6 +2383,18 @@ botocore = ">=1.37.4,<2.0a0"
 crt = ["botocore[crt] (>=1.37.4,<2.0a0)"]
 
 [[package]]
+name = "semver"
+version = "3.0.4"
+description = "Python helper for Semantic Versioning (https://semver.org)"
+optional = false
+python-versions = ">=3.7"
+groups = ["main"]
+files = [
+    {file = "semver-3.0.4-py3-none-any.whl", hash = "sha256:9c824d87ba7f7ab4a1890799cec8596f15c1241cb473404ea1cb0c55e4b04746"},
+    {file = "semver-3.0.4.tar.gz", hash = "sha256:afc7d8c584a5ed0a11033af086e8af226a9c0b206f313e0301f8dd7b6b589602"},
+]
+
+[[package]]
 name = "setuptools"
 version = "82.0.1"
 description = "Most extensible Python build backend with support for C/C++ extension modules"
@@ -2823,4 +2835,4 @@ cffi = ["cffi (>=1.17,<2.0) ; platform_python_implementation != \"PyPy\" and pyt
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10, <3.13"
-content-hash = "5df8ebb2d6b038fd441cf6d2bbfd8cd7613c30939a3bbea438900b9366a4d1c3"
+content-hash = "d9fb9d1c461e587d2cf3c2ca1e6053f69616f57e439f0c668ff5fb8e9ede973a"
