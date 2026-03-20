@@ -30,6 +30,7 @@ def _validate_data_contracts(files: list[Path] | list[str]) -> list[Run]:
     """Validate the provided data contract files."""
     results = list[Run]()
     for file in files:
+        typer.echo(f"Validating data contract: {file}")
         if isinstance(file, Path):
             if file.suffix in [".yml", ".yaml"]:
                 data_contract = DataContract(data_contract_file=str(file))
@@ -47,7 +48,10 @@ def validate_data_contracts(files: list[Path]) -> list[Run]:
 @app.command("validate-data-contract")
 def cli(
     data_contract_paths: Annotated[
-        list[Path], typer.Argument(help="Path to data contract files to validate.")
+        list[Path],
+        typer.Argument(
+            help="Path to data contract files to validate. A list of paths separated by whitespace. Supports both .yml and .yaml files."
+        ),
     ],
     databricks_token: Annotated[
         str | None,
@@ -70,7 +74,7 @@ def cli(
     _set_token(token=databricks_token, service_account=databricks_service_account)
     results = _validate_data_contracts(files=data_contract_paths)
     for res in results:
-        if not res.has_passed():
-            print(res.pretty_logs())
+        # if not res.has_passed():
+        print(res.pretty_logs())
     if any(not res.has_passed() for res in results):
         raise Exception("Some data contracts failed validation. See logs for details.")
