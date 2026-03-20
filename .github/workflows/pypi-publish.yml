@@ -17,6 +17,10 @@ on:
         description: "Version-number to be published. Setting this input-value will update the version-field in pyproject.toml, and the changes will be pushed to Github. If omitted, the value from pyproject.toml will be used."
         required: false
         type: string
+      ref:
+        description: "Git ref to checkout for building the package. Defaults to main."
+        required: false
+        type: string
 
 permissions:
   id-token: write # Required for Octo STS
@@ -38,6 +42,7 @@ jobs:
         with:
           token: ${{ steps.octo-sts.outputs.token }}
           fetch-depth: 0
+          ref: ${{ github.event.inputs.ref || 'main'}}
 
       - name: Install Poetry
         run: pipx install poetry
