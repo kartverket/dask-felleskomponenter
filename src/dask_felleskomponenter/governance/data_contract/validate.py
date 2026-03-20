@@ -9,7 +9,7 @@ import typer
 from typing import Annotated
 from databricks.sdk import WorkspaceClient
 from datacontract.data_contract import DataContract
-from datacontract.model.run import Run, Check
+from datacontract.model.run import Run, Check, Log
 from dask_felleskomponenter.governance.data_contract.checks import (
     check_id_uuid,
     check_status_enum,
@@ -54,11 +54,15 @@ def _validate_kartverket_spec(data_contract: OpenDataContractStandard) -> list[C
     return checks
 
 
+def _pretty_print_checks(checks: list[Check]) -> str:
+    """Pretty print the provided checks."""
+    return "\n".join(f"{check.type} - {check.name}: {check.result}" for check in checks)
+
+
 def _validate_data_contracts(files: list[Path] | list[str]) -> list[Run]:
     """Validate the provided data contract files."""
     results = list[Run]()
     for file in files:
-        typer.echo(f"Validating data contract: {file}")
         data_contract = _create_datacontract_object(file)
         run = data_contract.test()
         kartverket_checks = _validate_kartverket_spec(
@@ -105,5 +109,11 @@ def cli(
     """Validate data contracts against the Kartverket spec and Databricks data."""
     _set_token(token=databricks_token, service_account=databricks_service_account)
     results = _validate_data_contracts(files=data_contract_paths)
+    for run in results:
+        typer.echo(
+            f"Results for data contract {run.dataContractId} version {run.dataContractVersion}:"
+        )
+        typer.echo("Checks:")
+        typer.echo(_pretty_print_checks([check for check in run.checks]))
     if any(not res.has_passed() for res in results):
         raise Exception("Some data contracts failed validation. See logs for details.")
